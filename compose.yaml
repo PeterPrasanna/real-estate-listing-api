@@ -9,14 +9,13 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: "postgresql://app:app@database:5432/real_estate?serverVersion=16&charset=utf8"
+
   database:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: real_estate
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,5 +23,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
 volumes:
   postgres_data:

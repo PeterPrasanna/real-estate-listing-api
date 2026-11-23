@@ -8,3 +8,4 @@ framework:
         enabled: true
     validation:
         enabled: true
+    test: true
