@@ -1,0 +1,1 @@
+This repository is a starter scaffold, not a production-validated app. Verify Composer dependency resolution, Symfony configuration, authentication and endpoint behavior locally before publishing. Replace demo secrets, add migrations and functional tests.
