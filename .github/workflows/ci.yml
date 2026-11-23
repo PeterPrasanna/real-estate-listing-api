@@ -1,0 +1,70 @@
+
+name: Backend CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+          POSTGRES_DB: real_estate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d real_estate_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      APP_ENV: test
+      APP_SECRET: test_secret
+      DATABASE_URL: "postgresql://app:app@127.0.0.1:5432/real_estate_test?serverVersion=16&charset=utf8"
+      JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
+      JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
+      JWT_PASSPHRASE: test_passphrase
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_pgsql, openssl, mbstring, xml
+          coverage: none
+
+      - name: Verify Symfony project files
+        run: |
+          pwd
+          ls -la
+          test -f bin/console || {
+            echo "ERROR: bin/console is missing from the repository"
+            exit 1
+          }
+
+      - name: Validate Composer
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction
+
+      - name: Run database migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit

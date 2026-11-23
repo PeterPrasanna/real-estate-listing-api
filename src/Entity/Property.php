@@ -9,25 +9,92 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiFilter(SearchFilter::class, properties: ['city' => 'partial', 'propertyType' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['price'])]
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['property:read']]),
-        new Get(normalizationContext: ['groups' => ['property:read']]),
-        new Post(processor: \App\State\PropertyOwnerProcessor::class, denormalizationContext: ['groups' => ['property:write']], normalizationContext: ['groups' => ['property:read']]),
-        new Put(security: "object.getOwner() == user", denormalizationContext: ['groups' => ['property:write']], normalizationContext: ['groups' => ['property:read']]),
-        new Patch(security: "object.getOwner() == user", denormalizationContext: ['groups' => ['property:write']], normalizationContext: ['groups' => ['property:read']]),
-        new Delete(security: "object.getOwner() == user")
+        new GetCollection(
+            normalizationContext: ['groups' => ['property:read']],
+            openapi: new Operation(
+                summary: 'Lister et rechercher les annonces immobilières',
+                description: 'Retourne les annonces immobilières avec des filtres par ville, type de bien et prix.',
+                parameters: [
+                    new Parameter(
+                        name: 'price[between]',
+                        in: 'query',
+                        description: 'Prix compris entre deux valeurs (incluses). Exemple : 200000..400000',
+                        required: false
+                    ),
+                    new Parameter(
+                        name: 'price[gt]',
+                        in: 'query',
+                        description: 'Prix strictement supérieur à la valeur indiquée (>). Exemple : 300000',
+                        required: false
+                    ),
+                    new Parameter(
+                        name: 'price[gte]',
+                        in: 'query',
+                        description: 'Prix supérieur ou égal à la valeur indiquée (>=). Exemple : 300000',
+                        required: false
+                    ),
+                    new Parameter(
+                        name: 'price[lt]',
+                        in: 'query',
+                        description: 'Prix strictement inférieur à la valeur indiquée (<). Exemple : 300000',
+                        required: false
+                    ),
+                    new Parameter(
+                        name: 'price[lte]',
+                        in: 'query',
+                        description: 'Prix inférieur ou égal à la valeur indiquée (<=). Exemple : 300000',
+                        required: false
+                    ),
+                ]
+            )
+        ),
+
+        new Get(
+            normalizationContext: ['groups' => ['property:read']]
+        ),
+
+        new Post(
+            processor: \App\State\PropertyOwnerProcessor::class,
+            denormalizationContext: ['groups' => ['property:write']],
+            normalizationContext: ['groups' => ['property:read']]
+        ),
+
+        new Put(
+            security: "object.getOwner() == user",
+            denormalizationContext: ['groups' => ['property:write']],
+            normalizationContext: ['groups' => ['property:read']]
+        ),
+
+        new Patch(
+            security: "object.getOwner() == user",
+            denormalizationContext: ['groups' => ['property:write']],
+            normalizationContext: ['groups' => ['property:read']]
+        ),
+
+        new Delete(
+            security: "object.getOwner() == user"
+        )
     ],
     normalizationContext: ['groups' => ['property:read']],
     denormalizationContext: ['groups' => ['property:write']]
 )]
+
 class Property
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
