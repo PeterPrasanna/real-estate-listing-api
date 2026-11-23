@@ -31,6 +31,17 @@ Visit **http://localhost:8000/api/docs**.
 
 **Note:** This is a development scaffold. Dependency installation and end-to-end tests have not been verified in this environment. The generated JWT keys are local to the container. For persistence across rebuilds, mount `config/jwt` as a volume.
 
+
+
+## Troubleshooting
+
+If you encounter issues with Docker, Composer,
+API Platform, Swagger UI or JWT authentication,
+please refer to our troubleshooting guide:
+
+[View Troubleshooting Guide](https://github.com/PeterPrasanna/real-estate-listing-api/blob/main/doc/TROUBLESHOOTING.md)
+
+
 ## API endpoints
 
 | Method | Path | Access |
@@ -69,14 +80,6 @@ curl -X POST http://localhost:8000/api/properties \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -d '{"title":"Bright apartment","description":"Near the metro","price":285000,"city":"Lyon","postalCode":"69003","propertyType":"apartment"}'
 ```
-
-## Troubleshooting
-
-If you encounter issues with Docker, Composer,
-API Platform, Swagger UI or JWT authentication,
-please refer to our troubleshooting guide:
-
-[View Troubleshooting Guide](docs/TROUBLESHOOTING.md)
 
 ## Roadmap
 - [ ] Add Doctrine migrations and demo fixtures
