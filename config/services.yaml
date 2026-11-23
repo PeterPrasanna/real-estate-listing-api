@@ -5,5 +5,8 @@ services:
     App\:
         resource: ../src/
         exclude:
-            - ../src/Entity/
-            - ../src/Kernel.php
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+    App\DataFixtures\PropertyFixtures:
+        tags: ['doctrine.fixture.orm']
