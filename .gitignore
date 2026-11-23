@@ -1,10 +1,28 @@
+# Symfony
 /vendor/
 /var/
 /.env.local
 /.env.*.local
+
+# JWT private keys
 /config/jwt/*.pem
-.phpunit.result.cache
-/.phpunit.cache/
-.idea/
+
+# Local secrets
+*.key
+*.p12
+*.pfx
+
+# IDE
+/.idea/
 /.vscode/
+
+# Operating system
 .DS_Store
+Thumbs.db
+
+# PHPUnit
+/.phpunit.cache/
+/phpunit.xml
+
+# Docker local overrides
+/compose.override.yaml
